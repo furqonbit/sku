@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateSkuDto } from './dto/create-sku.dto';
 import { UpdateSkuDto } from './dto/update-sku.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,7 +11,11 @@ export class SkuService {
   constructor(@InjectModel(Sku.name) private skuModel: Model<SkuDocument>) {}
 
   async create(createSkuDto: CreateSkuDto) {
-    return await new this.skuModel(createSkuDto).save();
+    try {
+      return await new this.skuModel(createSkuDto).save();
+    } catch (error) {
+      throw new BadRequestException('Data cannot be processed');
+    }
   }
 
   async findAll(paginationParams: PaginationParams) {
@@ -26,7 +30,11 @@ export class SkuService {
   }
 
   async update(id: string, updateSkuDto: UpdateSkuDto) {
-    return await this.skuModel.findByIdAndUpdate(id, updateSkuDto);
+    try {
+      return await this.skuModel.findByIdAndUpdate(id, updateSkuDto);
+    } catch (error) {
+      throw new BadRequestException('Data cannot be processed');
+    }
   }
 
   async remove(id: string) {
